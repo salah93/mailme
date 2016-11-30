@@ -1,14 +1,13 @@
 #! /usr/local/bin/python
-import smtplib
-import sys
-from contextlib import contextmanager 
-
-from .credentials import myemail, mypassword
 
 
-def mailto(to, msg):
+def mailto(to, msg, subject=''):
+    from contextlib import contextmanager 
+    from .credentials import myemail, mypassword
+    msg = 'Subject: {subject}\n\n{body}'.format(subject=subject, body=msg)
     @contextmanager
     def login(email, password):
+        import smtplib
         # port 465 or 587
         port = 587
         try:
@@ -17,13 +16,19 @@ def mailto(to, msg):
             server.starttls()
             server.ehlo()
             server.login(myemail, mypassword)
+            server.sendmail
             yield server
         finally:
-            server.close()
+            server.quit()
     with login(myemail, mypassword) as s:
         s.sendmail(myemail, to, msg)
 
 
 if __name__ == '__main__':
-    to, msg = sys.argv[1:]
-    mailto(to, msg)
+    from argparse import ArgumentParser
+    parser = ArgumentParser()
+    parser.add_argument('TO')
+    parser.add_argument('MSG')
+    parser.add_argument('--subject', default='')
+    args = parser.parse_args()
+    mailto(args.TO, args.MSG, args.subject)
