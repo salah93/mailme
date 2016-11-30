@@ -8,12 +8,11 @@ DESCRIPTION = '\n\n'.join(open(join(FOLDER, x)).read().strip() for x in [
 
 setup(
     name='mailme',
-    version='0.0.1',
+    version='0.0.2',
     description='email module',
     long_description=DESCRIPTION,
     classifiers=[
         'Programming Language :: Python',
-        #'Framework :: Pyramid',
         'Topic :: Internet :: WWW/HTTP :: WSGI :: Application',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',

@@ -3,7 +3,7 @@ import smtplib
 import sys
 from contextlib import contextmanager 
 
-from credentials import myemail, mypassword
+from .credentials import myemail, mypassword
 
 
 def mailto(to, msg):
