@@ -1,34 +1,46 @@
-#! /usr/local/bin/python
+import smtplib
+
+from email.mime.application import MIMEApplication
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from typing import List
+from os.path import basename
 
 
-def mailto(to, msg, subject=''):
-    from contextlib import contextmanager 
-    from .credentials import myemail, mypassword
-    msg = 'Subject: {subject}\n\n{body}'.format(subject=subject, body=msg)
-    @contextmanager
-    def login(email, password):
-        import smtplib
-        # port 465 or 587
-        port = 587
-        try:
-            server = smtplib.SMTP('smtp.gmail.com', port) 
-            server.ehlo()
-            server.starttls()
-            server.ehlo()
-            server.login(myemail, mypassword)
-            server.sendmail
-            yield server
-        finally:
-            server.quit()
-    with login(myemail, mypassword) as s:
-        s.sendmail(myemail, to, msg)
+class PayloadBuilder(object):
+    def __init__(self, alias_from):
+        self.__payload = MIMEMultipart()
+        self.__payload["From"] = alias_from
+
+    def add_message(self, message):
+        self.__payload.attach(MIMEText(message))
+        return self
+
+    def add_attachment(self, attachment):
+        with open(attachment, "r") as f:
+            app = MIMEApplication(f.read())
+        app.add_header(
+            "Content-Disposition", "attachment", filename=basename(attachment)
+        )
+        self.__payload.attach(app)
+        return self
+
+    def add_subject(self, subject):
+        self.__payload["Subject"] = subject
+        return self
+
+    def get_payload(self):
+        return self.__payload
 
 
-if __name__ == '__main__':
-    from argparse import ArgumentParser
-    parser = ArgumentParser()
-    parser.add_argument('TO')
-    parser.add_argument('MSG')
-    parser.add_argument('--subject', default='')
-    args = parser.parse_args()
-    mailto(args.TO, args.MSG, args.subject)
+class Mail(object):
+    def __init__(self, email_address, password):
+        self._from = email_address
+        self._password = password
+
+    def send(self, to: List[str], payload: MIMEMultipart):
+        to = to if isinstance(to, list) else [to]
+        with smtplib.SMTP(host="smtp.gmail.com", port=587) as s:
+            s.starttls()
+            s.login(self._from, self._password)
+            return s.sendmail(self._from, to, payload.as_string())
