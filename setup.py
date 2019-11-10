@@ -2,27 +2,26 @@ from os.path import abspath, dirname, join
 from setuptools import find_packages, setup
 
 
-FOLDER = dirname(abspath(__file__))
-DESCRIPTION = '\n\n'.join(open(join(FOLDER, x)).read().strip() for x in [
-    'README.rst'])
+with open('README.md') as f:
+    DESCRIPTION = f.read()
+
 
 setup(
     name='mailme',
-    version='0.0.2',
+    version='1.0.0',
     description='email module',
     long_description=DESCRIPTION,
+    author='Salah Ahmed',
+    author_email='salahs.email@pm.me',
+    url='https://github.com/salah93/mailme',
+    keywords='mail python',
+    packages=find_packages(),
+    include_package_data=True,
+    zip_safe=False,
     classifiers=[
         'Programming Language :: Python',
         'Topic :: Internet :: WWW/HTTP :: WSGI :: Application',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
     ],
-    author='Salah Ahmed',
-    author_email='salah.ahmed.hslc@gmail.com',
-    url='https://twitter.com/saloohimon',
-    keywords='mail gmail python',
-    packages=find_packages(),
-    include_package_data=True,
-    zip_safe=False,
-    install_requires=[],
-    tests_require=[])
+)
